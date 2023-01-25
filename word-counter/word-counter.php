@@ -2,12 +2,13 @@
 
 /*
 Plugin Name: Word Counter
-Description: Permite añadir estadísticas en los posts. Configurable.
-Version: 1.0
+Description: Shows the number of word and characters on every post. Customizable and translation ready!
+Version: 1.1
 Requires PHP: 8.1
 Author: Víctor Ruiz
 Author URI: https://es.linkedin.com/in/varuiza
 Text Domain: wrdcntr
+Domain Path: /languages
 */
 
 
@@ -20,6 +21,11 @@ class WordCounterPlugin
 		add_action('admin_menu', array($this, 'adminPage'));
 		add_action('admin_init', array($this, 'settings'));
 		add_filter('the_content', array($this, 'ifWrap'));
+		add_action('init', array($this, 'languages'));
+	}
+
+	function languages() {
+		load_plugin_textdomain('wrdcntr', false, dirname(plugin_basename(__FILE__)) . '/languages');
 	}
 
 	function ifWrap($content)
@@ -45,15 +51,15 @@ class WordCounterPlugin
 		}
 
 		if (get_option('wcp_wordcount', '1')) {
-			$html .= 'This post has ' . $wordCount . ' words.<br>';
+			$html .= esc_html__('This post has', 'wrdcntr') . ' ' . $wordCount . ' ' . esc_html__('words', 'wrdcntr') . '.<br>';
 		}
 
 		if (get_option('wcp_charactercount', '1')) {
-			$html .= 'This post has ' . strlen(strip_tags($content)) . ' characters.<br>';
+			$html .= esc_html__('This post has', 'wrdcntr') . ' ' . strlen(strip_tags($content)) . ' ' . esc_html__('characters', 'wrdcntr') . '.<br>';
 		}
 
 		if (get_option('wcp_readtime', '1')) {
-			$html .= 'This will take about ' . round($wordCount / 225) . ' minute(s) to read.';
+			$html .= esc_html__('Reading this post will take about', 'wrdcntr') . ' ' . round($wordCount / 225) . ' ' . esc_html__('minute(s)', 'wrdcntr') . '.';
 		}
 
 		$html . '</p>';
@@ -103,8 +109,8 @@ class WordCounterPlugin
 	function locationHTML()
 	{ ?>
 		<select name="wcp_location">
-			<option value="Beginning" <?php selected(get_option('wcp_location'), 'Beginning'); ?>>Beginning of post</option>
-			<option value="End" <?php selected(get_option('wcp_location'), 'End'); ?>>End of post</option>
+			<option value="Beginning" <?php selected(get_option('wcp_location'), 'Beginning'); ?>><?php echo esc_html__('Beginning of post', 'wrdcntr'); ?></option>
+			<option value="End" <?php selected(get_option('wcp_location'), 'End'); ?>><?php echo esc_html__('End of post', 'wrdcntr'); ?></option>
 		</select>
 	<?php }
 
@@ -130,13 +136,13 @@ class WordCounterPlugin
 
 	function adminPage()
 	{
-		add_options_page('Word Counter Settings', 'Word Counter', 'manage_options', 'word-counter-settings-page', array($this, 'settingsHTML'));
+		add_options_page('Word Counter Settings', __('Word Counter', 'wrdcntr'), 'manage_options', 'word-counter-settings-page', array($this, 'settingsHTML'));
 	}
 
 	function settingsHTML()
 	{ ?>
 		<div class="wrap">
-			<h1>Word Counter Settings</h1>
+			<h1><?php echo __('Word Counter Settings', 'wrdcntr'); ?></h1>
 			<form action="options.php" method="POST">
 				<?php
 				settings_fields('wordcounterplugin');
